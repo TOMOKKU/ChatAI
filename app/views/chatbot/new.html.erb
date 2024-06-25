@@ -1,0 +1,80 @@
+<!--v1-->
+<!-- <h1>音声チャットボット</h1>
+<form id="audioForm">
+  <input type="file" accept="audio/*" id="audioInput">
+  <button type="submit">送信</button>
+</form>
+<div id="response"></div>
+
+<script>
+  document.getElementById('audioForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var audioInput = document.getElementById('audioInput').files[0];
+
+    var formData = new FormData();
+    formData.append('audio', audioInput);
+
+    fetch('/chatbot/create', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('response').innerHTML = `<p>Transcription: ${data.transcription}</p><p>Response: ${data.response}</p>`;
+    })
+    .catch(error => console.error('Error:', error));
+  });
+</script> -->
+<!-- app/views/chatbot/new.html.erb -->
+<!--v2-->
+<h1>音声チャットボット</h1>
+<button id="recordButton">録音開始</button>
+<button id="stopButton" disabled>録音停止</button>
+<div id="response"></div>
+
+<script>
+  let mediaRecorder;
+  let audioChunks = [];
+
+  document.getElementById('recordButton').addEventListener('click', async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+
+    mediaRecorder.ondataavailable = event => {
+      audioChunks.push(event.data);
+    };
+
+    mediaRecorder.onstop = async () => {
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'audio.webm');
+
+      const response = await fetch('/chatbot/create', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+      console.log(data);
+      if (data.response) {
+        document.getElementById('response').innerText = data.response;
+      } else if (data.error) {
+        document.getElementById('response').innerText = `Error: ${data.error}`;
+      } else {
+        document.getElementById('response').innerText = 'No response received';
+      }
+    //   document.getElementById('response').innerHTML = `<p>Transcription: ${data.transcription}</p><p>Response: ${data.response}</p>`;
+      audioChunks = [];
+    };
+
+    mediaRecorder.start();
+    document.getElementById('recordButton').disabled = true;
+    document.getElementById('stopButton').disabled = false;
+  });
+
+  document.getElementById('stopButton').addEventListener('click', () => {
+    mediaRecorder.stop();
+    document.getElementById('recordButton').disabled = false;
+    document.getElementById('stopButton').disabled = true;
+  });
+</script>

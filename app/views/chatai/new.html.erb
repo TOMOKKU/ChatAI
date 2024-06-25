@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chatbot</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <script>
+    async function sendMessage() {
+      const message = document.getElementById('message').value;
+      const response = await fetch('/chatai/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ message: message })
+      });
+
+      const data = await response.json();
+      console.log(data);
+      if (data.gpt_response) {
+        document.getElementById('response').innerText = data.gpt_response;
+      } else if (data.error) {
+        document.getElementById('response').innerText = `Error: ${data.error}`;
+      } else {
+        document.getElementById('response').innerText = 'No response received';
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>Chatbot</h1>
+  <div>
+    <input type="text" id="message" placeholder="Enter your message" />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+  <div>
+    <p id="response"></p>
+  </div>
+</body>
+</html>

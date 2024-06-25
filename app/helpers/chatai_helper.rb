@@ -1,0 +1,2 @@
+module ChataiHelper
+end
