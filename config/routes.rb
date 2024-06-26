@@ -5,5 +5,6 @@ Rails.application.routes.draw do
   post 'chatai/create' => 'chatai#create'
   get 'chatbot/new' => 'chatbot#new'
   post 'chatbot/create' => 'chatbot#create'
+  get 'chatbot/reset' => 'chatbot#reset'
   get 'chatbot/:id' => 'chatbot#show'
 end

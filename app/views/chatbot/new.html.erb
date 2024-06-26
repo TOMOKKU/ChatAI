@@ -1,160 +1,3 @@
-<!-- <h1>音声チャットボット</h1>
-<form id="audioForm">
-  <input type="file" accept="audio/*" id="audioInput">
-  <button type="submit">送信</button>
-</form>
-<div id="response"></div>
-
-<script>
-  document.getElementById('audioForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    var audioInput = document.getElementById('audioInput').files[0];
-
-    var formData = new FormData();
-    formData.append('audio', audioInput);
-
-    fetch('/chatbot/create', {
-      method: 'POST',
-      body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-      document.getElementById('response').innerHTML = `<p>Transcription: ${data.transcription}</p><p>Response: ${data.response}</p>`;
-    })
-    .catch(error => console.error('Error:', error));
-  });
-</script> -->
-
-<!-- <!DOCTYPE html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>音声チャットボット</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f0f0f0;
-    }
-
-    .container {
-      text-align: center;
-    }
-
-    h1 {
-      color: #333;
-    }
-
-    #recordButton, #stopButton {
-      font-size: 1.2em;
-      padding: 10px 20px;
-      margin: 10px;
-      cursor: pointer;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      outline: none;
-      transition: background-color 0.3s;
-    }
-
-    #recordButton:disabled, #stopButton:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-
-    #recordButton:hover, #stopButton:hover {
-      background-color: #45a049;
-    }
-
-    #responseContainer {
-      margin-top: 20px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      background-color: #fff;
-      max-width: 400px;
-      text-align: left;
-      overflow-y: scroll; /* スクロールバーを表示 */
-      max-height: 300px; /* 最大の高さを設定 */
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>音声チャットボット</h1>
-    <button id="recordButton">録音開始</button>
-    <button id="stopButton" disabled>録音停止</button>
-    <div id="responseContainer"></div>
-  </div>
-
-  <script>
-    let mediaRecorder;
-    let audioChunks = [];
-    let responses = []; // 過去のレスポンスを格納する配列
-
-    const responseContainer = document.getElementById('responseContainer');
-
-    document.getElementById('recordButton').addEventListener('click', async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder = new MediaRecorder(stream);
-
-      mediaRecorder.ondataavailable = event => {
-        audioChunks.push(event.data);
-      };
-
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-        const formData = new FormData();
-        formData.append('audio', audioBlob, 'audio.webm');
-
-        const response = await fetch('/chatbot/create', {
-          method: 'POST',
-          body: formData
-        });
-
-        const data = await response.json();
-        console.log(data);
-
-        // レスポンスを配列に追加
-        responses.push(data);
-
-        // 過去のレスポンスを表示
-        displayResponses();
-
-        audioChunks = [];
-      };
-
-      mediaRecorder.start();
-      document.getElementById('recordButton').disabled = true;
-      document.getElementById('stopButton').disabled = false;
-    });
-
-    document.getElementById('stopButton').addEventListener('click', () => {
-      mediaRecorder.stop();
-      document.getElementById('recordButton').disabled = false;
-      document.getElementById('stopButton').disabled = true;
-    });
-
-    // 過去のレスポンスを表示する関数
-    function displayResponses() {
-      responseContainer.innerHTML = ''; // 内容をクリア
-
-      responses.forEach((response, index) => {
-        const responseElement = document.createElement('div');
-        responseElement.classList.add('response-item');
-        responseElement.innerHTML = `<p>Response ${index + 1}: ${response.response}</p>`;
-        responseContainer.appendChild(responseElement);
-      });
-    }
-  </script>
-</body>
-</html> -->
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -272,15 +115,17 @@
 
         // レスポンスを配列に追加
         responses.push(data);
-
         // 過去のレスポンスを表示
         displayResponses();
+        if (data.response == '再入力してください。') {
+          responses.pop();
+        } else {
+          // ステップを進める
+          currentStep++;
+        }
 
         // audioChunksをリセット
         audioChunks = [];
-
-        // ステップを進める
-        currentStep++;
         if (currentStep < prompts.length) {
           promptElement.innerText = prompts[currentStep];
         } else {
