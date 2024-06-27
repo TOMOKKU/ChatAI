@@ -3,6 +3,8 @@ Rails.application.routes.draw do
   root 'chatai#new'
   get 'chatai/new' => 'chatai#new'
   post 'chatai/create' => 'chatai#create'
+
+  get 'chatbot/index' => 'chatbot#index'
   get 'chatbot/new' => 'chatbot#new'
   post 'chatbot/create' => 'chatbot#create'
   get 'chatbot/reset' => 'chatbot#reset'

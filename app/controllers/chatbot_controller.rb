@@ -11,6 +11,11 @@ class ChatbotController < ApplicationController
         '依頼の日程と思われる年月日を`YYYY-MM-DD`に変換して、値のみを出力してください。もし日付だけで、年数がない場合は2024年としてして変換を行ってください。依頼の日程がない場合は"再入力してください。"と出力してください。'
     ]
 
+    def index
+        profiles = Profile.all
+        render json: profiles
+    end
+
     def show
         profile = Profile.find(params[:id])
         render json: profile
